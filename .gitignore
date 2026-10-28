@@ -1,0 +1,14 @@
+# build output
+bin/
+obj/
+publish/
+dist/
+*.wpftmp
+*_wpftmp.csproj
+
+# IDE / OS
+.vs/
+.idea/
+*.user
+Thumbs.db
+desktop.ini

@@ -1,0 +1,468 @@
+<Window x:Class="MilesFontExtractor.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ctl="clr-namespace:MilesFontExtractor.Controls"
+        Title="Miles Font Extractor" Width="1280" Height="840" MinWidth="1020" MinHeight="680"
+        WindowStartupLocation="CenterScreen" WindowStyle="None" ResizeMode="CanResize"
+        Background="{StaticResource BgBrush}" FontFamily="{StaticResource UiFont}"
+        TextElement.Foreground="{StaticResource TextBrush}" UseLayoutRounding="True" SnapsToDevicePixels="True"
+        TextOptions.TextFormattingMode="Ideal" TextOptions.TextRenderingMode="ClearType">
+
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="48" ResizeBorderThickness="6" GlassFrameThickness="0" CornerRadius="0" UseAeroCaptionButtons="False"/>
+    </WindowChrome.WindowChrome>
+
+    <Window.Resources>
+        <Style x:Key="Caption" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource MutedBrush}"/>
+            <Setter Property="FontSize" Value="12"/>
+        </Style>
+        <Style x:Key="OnlyWhenSelected" TargetType="FrameworkElement">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding PreviewItem}" Value="{x:Null}">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="OnlyWhenNone" TargetType="FrameworkElement">
+            <Setter Property="Visibility" Value="Collapsed"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding PreviewItem}" Value="{x:Null}">
+                    <Setter Property="Visibility" Value="Visible"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="Card" TargetType="Border">
+            <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource LineBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="16"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid x:Name="Root" Background="{StaticResource BgBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="48"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- ============================== Title bar ============================== -->
+        <Grid Grid.Row="0">
+            <StackPanel Orientation="Horizontal" Margin="18,0,0,0" VerticalAlignment="Center">
+                <ctl:MilesMark Width="26" Height="26"/>
+                <TextBlock Text="Miles Font Extractor" FontFamily="{StaticResource DisplayFont}" FontWeight="SemiBold" FontSize="14"
+                           Margin="12,0,0,0" VerticalAlignment="Center"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" WindowChrome.IsHitTestVisibleInChrome="True">
+                <Button Style="{StaticResource CaptionButton}" Click="Minimize_Click">
+                    <TextBlock Text="&#xE921;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="10"/>
+                </Button>
+                <Button Style="{StaticResource CaptionButton}" Click="Maximize_Click">
+                    <TextBlock x:Name="MaxGlyph" Text="&#xE922;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="10"/>
+                </Button>
+                <Button Style="{StaticResource CaptionButton}" Click="Close_Click">
+                    <TextBlock Text="&#xE8BB;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="10"/>
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <Grid Grid.Row="1">
+
+            <!-- ============================== Idle ============================== -->
+            <Grid Visibility="{Binding IsIdle, Converter={StaticResource BoolToVis}}">
+                <StackPanel MaxWidth="700" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="24,0,24,24">
+                    <ctl:MilesMark Width="84" Height="84" HorizontalAlignment="Center">
+                        <ctl:MilesMark.Effect><DropShadowEffect Color="#6C7CFF" BlurRadius="40" ShadowDepth="0" Opacity="0.45"/></ctl:MilesMark.Effect>
+                    </ctl:MilesMark>
+                    <TextBlock Text="Find the fonts that are really yours." FontFamily="{StaticResource DisplayFont}" FontWeight="SemiBold"
+                               FontSize="36" TextAlignment="Center" TextWrapping="Wrap" Margin="0,30,0,0"/>
+                    <TextBlock TextAlignment="Center" TextWrapping="Wrap" FontSize="15" Margin="0,14,0,0" LineHeight="23"
+                               Foreground="{StaticResource MutedBrush}"
+                               Text="Miles Font Extractor searches your PC for loose font files and leaves Windows and installed programs' fonts alone, so nothing breaks."/>
+
+                    <Border Style="{StaticResource Card}" Padding="20,16" Margin="0,34,0,0">
+                        <StackPanel>
+                            <TextBlock Text="DRIVES AND FOLDERS TO SCAN" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource MutedBrush}"/>
+                            <ItemsControl ItemsSource="{Binding Drives}" Margin="0,12,0,0">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Background="{StaticResource Surface2Brush}" CornerRadius="9" Padding="14,9" Margin="0,0,10,8">
+                                            <CheckBox Style="{StaticResource ModernCheck}" IsChecked="{Binding IsChecked, Mode=TwoWay}" Content="{Binding Label}"/>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                            <Button Style="{StaticResource GhostButton}" Content="+  Add a specific folder…" Command="{Binding AddFolderCommand}"
+                                    HorizontalAlignment="Left" Padding="14,8" FontSize="12.5" Margin="0,2,0,0"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Button Style="{StaticResource PrimaryButton}" Command="{Binding ScanCommand}" Content="Scan this PC"
+                            HorizontalAlignment="Center" Margin="0,28,0,0" MinWidth="220" FontSize="15"/>
+
+                    <Grid Margin="0,40,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/><ColumnDefinition/><ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Margin="8,0">
+                            <TextBlock Text="Smart exclusions" FontWeight="SemiBold" FontSize="13" TextAlignment="Center"/>
+                            <TextBlock Text="Windows and program fonts are recognised by proof, not by guesswork." TextWrapping="Wrap" TextAlignment="Center"
+                                       Style="{StaticResource Caption}" Margin="0,5,0,0"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Margin="8,0">
+                            <TextBlock Text="Verified copies" FontWeight="SemiBold" FontSize="13" TextAlignment="Center"/>
+                            <TextBlock Text="Every font is checked byte for byte before anything is touched." TextWrapping="Wrap" TextAlignment="Center"
+                                       Style="{StaticResource Caption}" Margin="0,5,0,0"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="2" Margin="8,0">
+                            <TextBlock Text="Safe clean-up" FontWeight="SemiBold" FontSize="13" TextAlignment="Center"/>
+                            <TextBlock Text="Originals move to the Recycle Bin 20 minutes after copying." TextWrapping="Wrap" TextAlignment="Center"
+                                       Style="{StaticResource Caption}" Margin="0,5,0,0"/>
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </Grid>
+
+            <!-- ============================== Scanning ============================== -->
+            <Grid Visibility="{Binding IsScanning, Converter={StaticResource BoolToVis}}">
+                <StackPanel MaxWidth="640" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="24,0,24,30">
+                    <TextBlock Text="Scanning your PC" FontFamily="{StaticResource DisplayFont}" FontWeight="SemiBold" FontSize="30" TextAlignment="Center"/>
+                    <TextBlock Text="{Binding ScanFound, StringFormat='{}{0:N0}'}" FontFamily="{StaticResource DisplayFont}" FontWeight="SemiBold"
+                               FontSize="84" TextAlignment="Center" Margin="0,22,0,0" Foreground="{StaticResource AccentBrush}"/>
+                    <TextBlock Text="font files found so far" Foreground="{StaticResource MutedBrush}" FontSize="15" TextAlignment="Center"/>
+
+                    <Border Height="6" CornerRadius="3" Background="{StaticResource Surface2Brush}" Margin="0,34,0,0" ClipToBounds="True">
+                        <Border Width="150" Height="6" CornerRadius="3" Background="{StaticResource AccentGradient}" HorizontalAlignment="Left">
+                            <Border.RenderTransform><TranslateTransform X="-150"/></Border.RenderTransform>
+                            <Border.Triggers>
+                                <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+                                    <BeginStoryboard>
+                                        <Storyboard RepeatBehavior="Forever">
+                                            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)"
+                                                             From="-150" To="640" Duration="0:0:1.6">
+                                                <DoubleAnimation.EasingFunction><SineEase EasingMode="EaseInOut"/></DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                            </Border.Triggers>
+                        </Border>
+                    </Border>
+
+                    <TextBlock Text="{Binding ScanFolders, StringFormat='{}{0:N0} folders checked'}" Style="{StaticResource Caption}"
+                               TextAlignment="Center" Margin="0,16,0,0" FontSize="13"/>
+                    <TextBlock Text="{Binding ScanCurrent}" Style="{StaticResource Caption}" TextAlignment="Center" TextTrimming="CharacterEllipsis"
+                               Margin="0,6,0,0" Opacity="0.65"/>
+                    <Button Style="{StaticResource GhostButton}" Content="Cancel" Command="{Binding CancelCommand}"
+                            HorizontalAlignment="Center" Margin="0,30,0,0" MinWidth="120"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- ============================== Review ============================== -->
+            <Grid Visibility="{Binding IsReview, Converter={StaticResource BoolToVis}}" Margin="24,4,24,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Category cards -->
+                <ItemsControl Grid.Row="0" ItemsSource="{Binding Cards}" x:Name="CardList">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate><UniformGrid Rows="1"/></ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Margin="0,0,10,0" Padding="16,14,16,12" CornerRadius="14" BorderThickness="1.5">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
+                                        <Setter Property="BorderBrush" Value="{StaticResource LineBrush}"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsActive}" Value="True">
+                                                <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+                                                <Setter Property="Background" Value="{StaticResource Surface2Brush}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                                <StackPanel>
+                                    <Button Style="{StaticResource FlatButton}" Command="{Binding DataContext.FilterCommand, ElementName=CardList}"
+                                            CommandParameter="{Binding}" HorizontalContentAlignment="Stretch"
+                                            AutomationProperties.Name="{Binding Title}">
+                                        <StackPanel>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Ellipse Width="8" Height="8" Fill="{Binding Accent}" VerticalAlignment="Center"/>
+                                                <TextBlock Text="{Binding Title}" FontSize="12.5" FontWeight="SemiBold" Margin="8,0,0,0"/>
+                                            </StackPanel>
+                                            <TextBlock Text="{Binding Count, StringFormat='{}{0:N0}'}" FontFamily="{StaticResource DisplayFont}"
+                                                       FontWeight="SemiBold" FontSize="30" Margin="0,8,0,0"/>
+                                            <TextBlock Text="{Binding Summary}" Style="{StaticResource Caption}"/>
+                                        </StackPanel>
+                                    </Button>
+                                    <Grid Margin="0,10,0,0" Height="22">
+                                        <CheckBox Style="{StaticResource ModernCheck}" Content="Include" FontSize="12.5"
+                                                  IsChecked="{Binding Include, Mode=TwoWay}"
+                                                  Visibility="{Binding Includable, Converter={StaticResource BoolToVis}}"/>
+                                        <TextBlock Text="Excluded · left alone" VerticalAlignment="Center">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock" BasedOn="{StaticResource Caption}">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Includable}" Value="True">
+                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <!-- List + preview -->
+                <Grid Grid.Row="1" Margin="0,16,0,16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="16"/>
+                        <ColumnDefinition Width="340"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0" Style="{StaticResource Card}">
+                        <Grid Margin="14,14,6,8">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <Grid Grid.Row="0" Margin="0,0,8,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="4,0,24,0">
+                                    <TextBlock Text="{Binding ListTitle}" FontFamily="{StaticResource DisplayFont}" FontWeight="SemiBold" FontSize="16"/>
+                                    <TextBlock Text="{Binding VisibleCountText}" Style="{StaticResource Caption}"/>
+                                </StackPanel>
+                                <TextBox Grid.Column="1" Style="{StaticResource SearchBox}" Height="38" MaxWidth="360" HorizontalAlignment="Left" Width="320"
+                                         Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"/>
+                                <StackPanel Grid.Column="2" Orientation="Horizontal">
+                                    <Button Style="{StaticResource GhostButton}" Content="Select shown" Padding="12,7" FontSize="12"
+                                            Command="{Binding SelectAllCommand}" CommandParameter="true"/>
+                                    <Button Style="{StaticResource GhostButton}" Content="Clear shown" Padding="12,7" FontSize="12" Margin="8,0,0,0"
+                                            Command="{Binding SelectAllCommand}" CommandParameter="false"/>
+                                </StackPanel>
+                            </Grid>
+
+                            <Grid Grid.Row="1" Margin="0,14,14,6">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="44"/><ColumnDefinition Width="2.2*"/><ColumnDefinition Width="76"/>
+                                    <ColumnDefinition Width="76"/><ColumnDefinition Width="132"/><ColumnDefinition Width="2.4*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="1" Text="FONT" Style="{StaticResource Caption}" FontSize="10.5" FontWeight="SemiBold"/>
+                                <TextBlock Grid.Column="2" Text="FORMAT" Style="{StaticResource Caption}" FontSize="10.5" FontWeight="SemiBold"/>
+                                <TextBlock Grid.Column="3" Text="SIZE" Style="{StaticResource Caption}" FontSize="10.5" FontWeight="SemiBold"/>
+                                <TextBlock Grid.Column="4" Text="STATUS" Style="{StaticResource Caption}" FontSize="10.5" FontWeight="SemiBold"/>
+                                <TextBlock Grid.Column="5" Text="LOCATION" Style="{StaticResource Caption}" FontSize="10.5" FontWeight="SemiBold"/>
+                            </Grid>
+
+                            <ListBox x:Name="FontList" Grid.Row="2" ItemsSource="{Binding View}" SelectedItem="{Binding PreviewItem, Mode=TwoWay}"
+                                     Background="Transparent" BorderThickness="0" ItemContainerStyle="{StaticResource RowStyle}" Foreground="{StaticResource TextBrush}"
+                                     VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling"
+                                     ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.CanContentScroll="True">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Height="48">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="44"/><ColumnDefinition Width="2.2*"/><ColumnDefinition Width="76"/>
+                                                <ColumnDefinition Width="76"/><ColumnDefinition Width="132"/><ColumnDefinition Width="2.4*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <CheckBox Style="{StaticResource ModernCheck}" IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                                      IsEnabled="{Binding CanSelect}" HorizontalAlignment="Center"/>
+                                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,10,0">
+                                                <TextBlock Text="{Binding FullName}" FontWeight="SemiBold" FontSize="13" TextTrimming="CharacterEllipsis"/>
+                                                <TextBlock Text="{Binding FileName}" Style="{StaticResource Caption}" FontSize="11.5" TextTrimming="CharacterEllipsis"/>
+                                            </StackPanel>
+                                            <TextBlock Grid.Column="2" Text="{Binding Format}" Style="{StaticResource Caption}" FontSize="12.5" VerticalAlignment="Center"/>
+                                            <TextBlock Grid.Column="3" Text="{Binding SizeText}" Style="{StaticResource Caption}" FontSize="12.5" VerticalAlignment="Center"/>
+                                            <Border Grid.Column="4" Background="{Binding CategorySoftBrush}" CornerRadius="7" Padding="9,3"
+                                                    HorizontalAlignment="Left" VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding CategoryLabel}" Foreground="{Binding CategoryBrush}" FontSize="11.5" FontWeight="SemiBold"/>
+                                            </Border>
+                                            <TextBlock Grid.Column="5" Text="{Binding Folder}" ToolTip="{Binding Path}" Style="{StaticResource Caption}"
+                                                       FontSize="12" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Margin="0,0,10,0"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+
+                            <TextBlock Grid.Row="2" Text="Nothing here" Style="{StaticResource Caption}" FontSize="14" HorizontalAlignment="Center"
+                                       VerticalAlignment="Center" Visibility="{Binding IsListEmpty, Converter={StaticResource BoolToVis}}"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- Preview -->
+                    <Border Grid.Column="2" Style="{StaticResource Card}" Padding="22,20">
+                        <Grid>
+                            <TextBlock Text="Select a font in the list to preview it and see why it was placed in its group."
+                                       TextWrapping="Wrap" Foreground="{StaticResource MutedBrush}" FontSize="13" LineHeight="20"
+                                       VerticalAlignment="Center" TextAlignment="Center" Margin="12,0"
+                                       Style="{StaticResource OnlyWhenNone}"/>
+                            <ScrollViewer VerticalScrollBarVisibility="Auto" Style="{StaticResource OnlyWhenSelected}">
+                                <StackPanel>
+                                    <Grid>
+                                        <TextBlock Text="PREVIEW" FontSize="10.5" FontWeight="SemiBold" Style="{StaticResource Caption}" VerticalAlignment="Center"/>
+                                        <Button Style="{StaticResource GhostButton}" Content="Show in folder" Command="{Binding ShowInFolderCommand}"
+                                                HorizontalAlignment="Right" Padding="11,5" FontSize="11.5"/>
+                                    </Grid>
+                                    <TextBlock Text="{Binding PreviewItem.Family}" FontFamily="{StaticResource DisplayFont}" FontWeight="SemiBold" FontSize="19"
+                                               TextWrapping="Wrap" Margin="0,8,0,0"/>
+                                    <Border Background="{StaticResource Surface2Brush}" CornerRadius="12" Padding="16,12" Margin="0,12,0,0">
+                                        <ctl:FontPreview Height="150" FilePath="{Binding PreviewItem.Path}"
+                                                         Foreground="{StaticResource TextBrush}" Muted="{StaticResource MutedBrush}"/>
+                                    </Border>
+
+                                    <Grid Margin="0,16,0,0">
+                                        <Border Background="{Binding PreviewItem.CategorySoftBrush}" CornerRadius="7" Padding="9,3" HorizontalAlignment="Left">
+                                            <TextBlock Text="{Binding PreviewItem.CategoryLabel}" Foreground="{Binding PreviewItem.CategoryBrush}" FontSize="12" FontWeight="SemiBold"/>
+                                        </Border>
+                                        <TextBlock FontSize="12" HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="{StaticResource MutedBrush}">
+                                            <Run Text="{Binding PreviewItem.Format, Mode=OneWay}"/><Run Text="  ·  "/><Run Text="{Binding PreviewItem.SizeText, Mode=OneWay}"/>
+                                        </TextBlock>
+                                    </Grid>
+                                    <TextBlock Text="{Binding PreviewItem.Reason}" TextWrapping="Wrap" FontSize="12.5" Margin="0,7,0,0" Foreground="{StaticResource MutedBrush}"/>
+
+                                    <TextBlock Text="LOCATION" FontSize="10.5" FontWeight="SemiBold" Style="{StaticResource Caption}" Margin="0,14,0,0"/>
+                                    <TextBlock Text="{Binding PreviewItem.Path}" TextWrapping="Wrap" FontSize="12" Margin="0,4,0,0" Foreground="{StaticResource MutedBrush}"/>
+
+                                    <TextBlock Text="COPYRIGHT" FontSize="10.5" FontWeight="SemiBold" Style="{StaticResource Caption}" Margin="0,14,0,0"/>
+                                    <TextBlock Text="{Binding PreviewItem.Copyright}" TextWrapping="Wrap" FontSize="11.5" Margin="0,4,0,0" Opacity="0.8"
+                                               Foreground="{StaticResource MutedBrush}" MaxHeight="52" TextTrimming="CharacterEllipsis"/>
+                                </StackPanel>
+                            </ScrollViewer>
+                        </Grid>
+                    </Border>
+                </Grid>
+
+                <!-- Action bar -->
+                <Border Grid.Row="2" Style="{StaticResource Card}" Padding="20,14" Margin="0,0,0,20">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="SAVE FONTS TO" FontSize="10.5" FontWeight="SemiBold" Style="{StaticResource Caption}"/>
+                            <Grid Margin="0,6,0,0">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <Border Background="{StaticResource Surface2Brush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="1"
+                                        CornerRadius="10" Padding="14,0" Height="38" MaxWidth="560" HorizontalAlignment="Stretch">
+                                    <TextBlock Text="{Binding DestFolder}" VerticalAlignment="Center" FontSize="13" TextTrimming="CharacterEllipsis"/>
+                                </Border>
+                                <Button Grid.Column="1" Style="{StaticResource GhostButton}" Content="Browse…" Command="{Binding BrowseCommand}"
+                                        Margin="10,0,0,0" Padding="16,0" Height="38"/>
+                            </Grid>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Margin="28,0" VerticalAlignment="Center" HorizontalAlignment="Right">
+                            <TextBlock Text="{Binding SelectionText}" FontWeight="SemiBold" FontSize="14" TextAlignment="Right"/>
+                            <TextBlock Text="Copied first · originals go to the Recycle Bin after 20 min" Style="{StaticResource Caption}" TextAlignment="Right" Margin="0,3,0,0"/>
+                        </StackPanel>
+                        <Button Grid.Column="2" Style="{StaticResource PrimaryButton}" Content="Extract fonts" Command="{Binding ExtractCommand}"
+                                VerticalAlignment="Center" MinWidth="170"/>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- ============================== Working ============================== -->
+            <Grid Visibility="{Binding IsWorking, Converter={StaticResource BoolToVis}}">
+                <StackPanel MaxWidth="600" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="24,0,24,30">
+                    <TextBlock Text="{Binding WorkTitle}" FontFamily="{StaticResource DisplayFont}" FontWeight="SemiBold" FontSize="28" TextAlignment="Center"/>
+                    <TextBlock Text="{Binding WorkText}" FontSize="15" Foreground="{StaticResource MutedBrush}" TextAlignment="Center" Margin="0,10,0,0"/>
+                    <ProgressBar Style="{StaticResource SlimProgress}" Height="8" Margin="0,28,0,0" Minimum="0" Maximum="{Binding WorkTotal, Mode=OneWay}" Value="{Binding WorkDone, Mode=OneWay}"/>
+                    <TextBlock Text="{Binding WorkCurrent}" Style="{StaticResource Caption}" TextAlignment="Center" TextTrimming="CharacterEllipsis" Margin="0,14,0,0"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- ============================== Countdown ============================== -->
+            <Grid Visibility="{Binding IsCountdown, Converter={StaticResource BoolToVis}}">
+                <Border Style="{StaticResource Card}" MaxWidth="680" Padding="44,40" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="24,0,24,30">
+                    <StackPanel>
+                        <Border Width="46" Height="46" CornerRadius="23" Background="#2234D399" HorizontalAlignment="Center">
+                            <TextBlock Text="&#xE73E;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="20" Foreground="#34D399"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <TextBlock Text="{Binding CountdownHeadline}" FontFamily="{StaticResource DisplayFont}" FontWeight="SemiBold" FontSize="26"
+                                   TextAlignment="Center" Margin="0,18,0,0"/>
+                        <TextBlock Text="{Binding CountdownBody}" Style="{StaticResource Caption}" FontSize="13.5" TextWrapping="Wrap" TextAlignment="Center" Margin="0,8,0,0"/>
+
+                        <TextBlock Text="{Binding RemainingText}" FontFamily="{StaticResource DisplayFont}" FontWeight="SemiBold" FontSize="76"
+                                   TextAlignment="Center" Margin="0,26,0,0" Foreground="{StaticResource TextBrush}"/>
+                        <TextBlock Text="until the originals move to the Recycle Bin" Style="{StaticResource Caption}" TextAlignment="Center" FontSize="13"/>
+                        <ProgressBar Style="{StaticResource SlimProgress}" Margin="0,22,0,0" Minimum="0" Maximum="1" Value="{Binding RemainingFraction, Mode=OneWay}"/>
+
+                        <TextBlock TextWrapping="Wrap" TextAlignment="Center" Style="{StaticResource Caption}" FontSize="12.5" LineHeight="19" Margin="0,22,0,0"
+                                   Text="Open the folder and check your fonts. If everything looks right, do nothing: each original is re-verified and removed automatically. Keep this window open, or the clean-up resumes next time you launch the app."/>
+
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,26,0,0">
+                            <Button Style="{StaticResource PrimaryButton}" Content="Open fonts folder" Command="{Binding OpenFolderCommand}" Padding="22,11"/>
+                            <Button Style="{StaticResource GhostButton}" Content="Keep originals" Command="{Binding KeepCommand}" Margin="10,0,0,0"/>
+                            <Button Style="{StaticResource GhostButton}" Content="Remove now" Command="{Binding RemoveNowCommand}" Margin="10,0,0,0"/>
+                        </StackPanel>
+                        <Button Style="{StaticResource GhostButton}" Content="Restart as administrator" Command="{Binding RestartAdminCommand}"
+                                Visibility="{Binding ShowAdminOnCountdown, Converter={StaticResource BoolToVis}}"
+                                HorizontalAlignment="Center" Margin="0,12,0,0" Padding="14,7" FontSize="12"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- ============================== Done ============================== -->
+            <Grid Visibility="{Binding IsDone, Converter={StaticResource BoolToVis}}">
+                <Border Style="{StaticResource Card}" MaxWidth="620" Padding="44,40" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="24,0,24,30">
+                    <StackPanel>
+                        <Border Width="56" Height="56" CornerRadius="28" Background="{StaticResource AccentGradient}" HorizontalAlignment="Center">
+                            <TextBlock Text="&#xE73E;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="24" Foreground="White"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <TextBlock Text="{Binding DoneTitle}" FontFamily="{StaticResource DisplayFont}" FontWeight="SemiBold" FontSize="28"
+                                   TextAlignment="Center" Margin="0,20,0,0"/>
+                        <TextBlock Text="{Binding DoneBody}" Style="{StaticResource Caption}" FontSize="14" TextWrapping="Wrap" TextAlignment="Center"
+                                   Margin="0,10,0,0" LineHeight="21"/>
+
+                        <UniformGrid Rows="1" Margin="0,26,0,0">
+                            <StackPanel>
+                                <TextBlock Text="{Binding ResultRemoved}" FontFamily="{StaticResource DisplayFont}" FontWeight="SemiBold" FontSize="30" TextAlignment="Center"/>
+                                <TextBlock Text="removed" Style="{StaticResource Caption}" TextAlignment="Center"/>
+                            </StackPanel>
+                            <StackPanel>
+                                <TextBlock Text="{Binding ResultKept}" FontFamily="{StaticResource DisplayFont}" FontWeight="SemiBold" FontSize="30" TextAlignment="Center"/>
+                                <TextBlock Text="kept" Style="{StaticResource Caption}" TextAlignment="Center"/>
+                            </StackPanel>
+                            <StackPanel>
+                                <TextBlock Text="{Binding ResultFailed}" FontFamily="{StaticResource DisplayFont}" FontWeight="SemiBold" FontSize="30" TextAlignment="Center"/>
+                                <TextBlock Text="couldn't remove" Style="{StaticResource Caption}" TextAlignment="Center"/>
+                            </StackPanel>
+                        </UniformGrid>
+
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,30,0,0">
+                            <Button Style="{StaticResource PrimaryButton}" Content="Open fonts folder" Command="{Binding OpenFolderCommand}" Padding="22,11"/>
+                            <Button Style="{StaticResource GhostButton}" Content="View log" Command="{Binding OpenLogCommand}" Margin="10,0,0,0"/>
+                            <Button Style="{StaticResource GhostButton}" Content="Scan again" Command="{Binding AgainCommand}" Margin="10,0,0,0"/>
+                        </StackPanel>
+                        <Button Style="{StaticResource GhostButton}" Content="Restart as administrator to finish" Command="{Binding RestartAdminCommand}"
+                                Visibility="{Binding NeedsAdmin, Converter={StaticResource BoolToVis}}"
+                                HorizontalAlignment="Center" Margin="0,12,0,0" Padding="14,7" FontSize="12"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>
