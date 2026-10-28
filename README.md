@@ -24,7 +24,7 @@
 A small Windows app that searches a PC for **loose font files** and gathers them into one folder. The fonts that belong to
 Windows or to an installed program are recognised and left untouched, so nothing breaks.
 
-It is built for a one-time job: it runs only while it is open, adds nothing to startup, and idles at about 37 MB of RAM.
+It is built for a one-time job: it runs only while it is open, adds nothing to startup, and idles under 60 MB of RAM.
 
 <div align="center">
 <img src="docs/demo.gif" alt="Walkthrough: scan, review, preview, copy, countdown, done" width="800">
