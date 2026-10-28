@@ -96,7 +96,7 @@ dotnet run --project src/MilesFontExtractor -c Release
 powershell -ExecutionPolicy Bypass -File build.ps1
 ```
 
-The installer is self-contained (no .NET install needed), installs per user without an admin prompt, and adds no startup entry or service.
+The installer is self-contained (no .NET install needed), installs per user (no admin prompt), and adds no startup entry or service.
 
 ## Project layout
 

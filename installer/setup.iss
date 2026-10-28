@@ -23,9 +23,8 @@ SolidCompression=yes
 WizardStyle=modern
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
-; A one-time tool: install for the current user without an admin prompt, but let an admin choose "all users".
+; A one-time tool: install for the current user, no admin prompt and no install-mode dialog.
 PrivilegesRequired=lowest
-PrivilegesRequiredOverridesAllowed=dialog
 CloseApplications=yes
 
 [Tasks]
