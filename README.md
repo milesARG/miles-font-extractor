@@ -8,6 +8,7 @@
 Windows and installed-program fonts are left alone.
 
 [![Release](https://img.shields.io/github/v/release/milesARG/miles-font-extractor?style=flat-square&color=6C7CFF)](https://github.com/milesARG/miles-font-extractor/releases/latest)
+[![Build](https://img.shields.io/github/actions/workflow/status/milesARG/miles-font-extractor/build.yml?style=flat-square)](https://github.com/milesARG/miles-font-extractor/actions)
 ![Windows 10 | 11](https://img.shields.io/badge/Windows-10%20%7C%2011-A06CFF?style=flat-square)
 [![MIT](https://img.shields.io/badge/license-MIT-8B93A7?style=flat-square)](LICENSE)
 
