@@ -12,3 +12,6 @@ dist/
 *.user
 Thumbs.db
 desktop.ini
+
+# website kit (kept local, not published)
+website-assets/

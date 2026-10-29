@@ -1,4 +1,4 @@
-<div align="center">
+﻿<div align="center">
 
 <img src="docs/logo.svg" alt="Miles Font Extractor logo" width="96" height="96">
 
@@ -15,7 +15,7 @@
 
 <br>
 
-<img src="website-assets/screenshots/04-review.png" alt="Miles Font Extractor review screen: five font groups with counts, and a list of loose fonts" width="900">
+<img src="docs/screenshots/04-review.png" alt="Miles Font Extractor review screen: five font groups with counts, and a list of loose fonts" width="900">
 
 </div>
 
@@ -52,8 +52,8 @@ itself, or anything that contains your Desktop or Documents. A folder called *Fo
 
 <table>
 <tr>
-<td width="50%"><img src="website-assets/screenshots/06-review-preview.png" alt="Font preview with specimen, reason, location and copyright"></td>
-<td width="50%"><img src="website-assets/screenshots/09-countdown.png" alt="Countdown screen: copies verified, timer, and the keep or remove buttons"></td>
+<td width="50%"><img src="docs/screenshots/06-review-preview.png" alt="Font preview with specimen, reason, location and copyright"></td>
+<td width="50%"><img src="docs/screenshots/09-countdown.png" alt="Countdown screen: copies verified, timer, and the keep or remove buttons"></td>
 </tr>
 <tr>
 <td><b>Review.</b> Preview any font and see exactly why it was placed in its group.</td>
@@ -74,7 +74,7 @@ Files in `C:\Windows\Fonts` need administrator rights to remove. The app offers 
 Use **Add a specific folder...** on the home screen to scan just one or two folders instead of whole drives. It takes seconds.
 
 <div align="center">
-<img src="website-assets/screenshots/02-home-folders-added.png" alt="Home screen with two folders added and the drives unticked" width="700">
+<img src="docs/screenshots/02-home-folders-added.png" alt="Home screen with two folders added and the drives unticked" width="700">
 </div>
 
 ## Command line
@@ -108,7 +108,6 @@ src/MilesFontExtractor/
   MainWindow.xaml, App.xaml   the interface (custom dark theme, no UI library)
 installer/       Inno Setup script
 tools/           brand assets, demo fonts, screenshot capture, demo GIF
-website-assets/  screenshots and copy for the project page
 docs/            logo, social preview, demo GIF
 ```
 
